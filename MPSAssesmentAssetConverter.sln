@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPSAssesmentAssetConverter", "MPSAssesmentAssetConverter\MPSAssesmentAssetConverter.csproj", "{CD51381C-9087-4A06-92AC-99330B93FDD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPSAssessmentAssetConverter.BusinessLogic", "MPSAssessmentAssetConverter.BusinessLogic\MPSAssessmentAssetConverter.BusinessLogic.csproj", "{B2C5510D-F3CB-4908-83EE-1C4C85B46F73}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD51381C-9087-4A06-92AC-99330B93FDD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD51381C-9087-4A06-92AC-99330B93FDD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD51381C-9087-4A06-92AC-99330B93FDD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD51381C-9087-4A06-92AC-99330B93FDD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2C5510D-F3CB-4908-83EE-1C4C85B46F73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2C5510D-F3CB-4908-83EE-1C4C85B46F73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2C5510D-F3CB-4908-83EE-1C4C85B46F73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2C5510D-F3CB-4908-83EE-1C4C85B46F73}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54AEE2AB-3DCA-4A68-A5C0-661996744246}
+	EndGlobalSection
+EndGlobal
