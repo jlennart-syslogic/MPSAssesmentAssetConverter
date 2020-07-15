@@ -63,14 +63,11 @@ namespace MPSAssessmentAssetConverter.BusinessLogic
         const int colComment = 12;
         const int colAssignedTo = 13;
 
-        public void ConvertFile(string inputFileNameAndPath, string outputFolder)
-        {
-            const string CompanyNameConstant = "MPS";
-            const string outputHeader = "Category,Company,Location,Manufacturer,Model Name,Serial Number,Purchase Date,Cart Number,Touch Screen,Order Number,Asset Tag,Notes";
+        public void ConvertFile(string inputFileNameAndPath, string outputFolder, string company, string outputHeader, string category, string manufacturer)
+        {       
+           
             var wb = new XLWorkbook(inputFileNameAndPath);
             var ws = wb.Worksheet(1);
-
-
             
             var lastRowUsed = ws.LastRowUsed().RowNumber();
 
@@ -79,7 +76,7 @@ namespace MPSAssessmentAssetConverter.BusinessLogic
             //First row is header row
             for (int row = 2; row <= lastRowUsed; row++)
             {
-                var newOutputRecord = RowToOutputFileRecord(ws.Row(row));
+                var newOutputRecord = RowToOutputFileRecord(ws.Row(row), company, category, manufacturer);
                 if (!string.IsNullOrWhiteSpace(newOutputRecord.AssetTag))
                 {
                     outputRecords.Add(newOutputRecord);
@@ -97,7 +94,7 @@ namespace MPSAssessmentAssetConverter.BusinessLogic
                 var outputFileRecords = outputRecords.Where(x=>x.Location == school);
 
                 //Remove white space from school name for file
-                var outputFileNameAndPath = $"{outputFolder}//{Regex.Replace(school, @"\s+", "")}AssetInventory.csv";
+                var outputFileNameAndPath = $"{outputFolder}{Regex.Replace(school, @"\s+|/+", "")}AssetInventory.csv";
                 using (var w = new StreamWriter(outputFileNameAndPath))
                 {
                     //var headerLineText = "First Name,Last Name,email,Username,Location,Phone Number,Job Title,Employee Number,Company";
@@ -105,8 +102,7 @@ namespace MPSAssessmentAssetConverter.BusinessLogic
                     w.Flush();
 
                     
-                    foreach (var outputFileRecord in outputFileRecords)
-                    {
+                    foreach (var outputFileRecord in outputFileRecords)                   {
 
                        
                         var line = $"{outputFileRecord.Category},{outputFileRecord.Company}," +
@@ -121,45 +117,62 @@ namespace MPSAssessmentAssetConverter.BusinessLogic
                     }
                 }
             }
-
-
-
-
-        }
-
-        private OutputFileRecord RowToOutputFileRecord(IXLRow row)
-        {
-            var assetTag = row.Cell(colAssignedTo).GetString();
-
-            var isInt = int.TryParse(assetTag, out int assetTagInt);
-
-            //Add only if asset tag is a 6 digit number
-            if (isInt  && assetTagInt > 99999 && assetTagInt < 1000000) {
-                return new OutputFileRecord
-                {
-                    CartNumber = EscapeCSVText(row.Cell(colCartNumber).GetString()),
-                    AssetTag = assetTag,
-                    Category = "Chromebooks",
-                    Company = "MPS",
-                    Location = EscapeCSVText(row.Cell(colSchool).GetString()).Trim(),
-                    Manufacturer = "Acer",
-                    ModelName = EscapeCSVText(row.Cell(colModel).GetString()),
-                    Notes = EscapeCSVText($"{row.Cell(colComment).GetString()} - {row.Cell(colPurchaseCode).GetString()}"),
-                    OrderNumber = EscapeCSVText(row.Cell(colPO).GetString()),
-                    PurchaseDate = EscapeCSVText(row.Cell(colDeploymentDate).GetString()),
-                    SerialNumber = EscapeCSVText(row.Cell(colSerialNumber).GetString()),
-                    TouchScreen = row.Cell(colVersion).GetString() == "Touch" ? "True" : "False"
-
-                };
-            }
-           
-            return new OutputFileRecord();
         }
 
        
+        private OutputFileRecord RowToOutputFileRecord(IXLRow row, string comapny, string category, string manufacturer)
+        {
+            var assetTag = row.Cell(colAssignedTo).GetString();
+            var assetTagValue = assetTag.ToString();
+
+
+            var isInt = int.TryParse(assetTag, out int assetTagInt);
+
+
+            if (isInt && assetTagInt > 99999 && assetTagInt < 1000000)
+            {
+                assetTagValue = assetTagInt.ToString();
+            }
+            else
+            {
+                row.Cell(colSerialNumber).TryGetValue<string>(out assetTagValue);
+            }
+
+
+            string po;
+            row.Cell(colPO).TryGetValue<string>(out po);
+        
+            if (!string.IsNullOrEmpty(assetTagValue))
+            {
+                return new OutputFileRecord
+                {
+                    CartNumber = EscapeCSVText(row.Cell(colCartNumber).GetString()),
+                    AssetTag = EscapeCSVText(assetTagValue),
+                    Category = category,
+                    Company = comapny,
+                    Location = EscapeCSVText(row.Cell(colSchool).GetString()).Trim(),
+                    Manufacturer = manufacturer,
+                    ModelName = EscapeCSVText(row.Cell(colModel).GetString()),
+                    Notes = EscapeCSVText($"{row.Cell(colComment).GetString()} - {row.Cell(colPurchaseCode).GetString()}"),
+                    OrderNumber = EscapeCSVText(po),
+                    PurchaseDate = EscapeCSVText(row.Cell(colDeploymentDate).GetString()),
+                    SerialNumber = EscapeCSVText(row.Cell(colSerialNumber).GetString()),
+                    TouchScreen = row.Cell(colVersion).GetString() == "Touch" ? "Yes" : "No"
+
+
+                };
+            }
+
+
+            return new OutputFileRecord();
+        }
+
 
         private string EscapeCSVText(string data)
         {
+            if (String.IsNullOrEmpty(data))
+                return String.Empty;
+
             if (data.Contains("\""))
             {
                 data = data.Replace("\"", "\"\"");
